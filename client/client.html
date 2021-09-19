@@ -3,9 +3,125 @@
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
+
+      const handleResponse = (xhr) => {
+          const type = xhr.getResponseHeader('content-type');
+
+          const content = document.querySelector('#content');
+
+          const h1 = document.createElement('h1');
+          const p = document.createElement('p');
+
+          if(type === 'application/json'){
+              const obj = JSON.parse(xhr.response);
+              if(obj.id){
+                  h1.textContent = obj.id;
+              }
+              else{
+                  h1.textContent = "Success";
+              }
+              p.textContent = obj.message;
+          }
+          else if(type === 'text/xml'){
+              if(xhr.responseXML.querySelector('id')){
+                  const id = xhr.responseXML.querySelector('id').textContent;
+                  h1.textContent = id;
+              }
+              else{
+                  h1.textContent = "Success";
+              }
+              const message = xhr.responseXML.querySelector('message').textContent;
+              p.textContent = message;
+          }
+
+          content.appendChild(h1);
+          content.appendChild(p);
+
+          console.log(xhr.response);
+      };
+
+      const sendAjax = (url, acceptedType) => {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('GET', url);
+        xhr.setRequestHeader('Accept', acceptedType);
+
+        xhr.onload = () => handleResponse(xhr);
+
+        xhr.send();
+      };
+
+      const init = () => {
+          const sendButton = document.querySelector('#send');
+          const typeSelector = document.querySelector('#type');
+          const pageSelector = document.querySelector('#page');
+
+          const sendData = () => {
+              if(typeSelector.value === 'application/json'){
+                  switch (pageSelector.value) {
+                      case "/":
+                          sendAjax('/', 'application/json');
+                          break;
+                      case "/success":
+                          sendAjax('/success', 'application/json');
+                          break;
+                      case "/badRequest":
+                          sendAjax('/badRequest', 'application/json');
+                          break;
+                      case "/unauthorized":
+                          sendAjax('/unauthorized', 'application/json');
+                          break;
+                      case "/forbidden":
+                          sendAjax('/forbidden', 'application/json');
+                          break;
+                      case "/internal":
+                          sendAjax('/internal', 'application/json');
+                          break;
+                      case "/notImplemented":
+                          sendAjax('/notImplemented', 'application/json');
+                          break;
+                      default:
+                          sendAjax('/notFound', 'application/json');
+                          break;
+                  }
+              }
+              else if(typeSelector.value === 'text/xml'){
+                    switch (pageSelector.value) {
+                      case "/":
+                          sendAjax('/', 'text/xml');
+                          break;
+                      case "/success":
+                          sendAjax('/success', 'text/xml');
+                          break;
+                      case "/badRequest":
+                          sendAjax('/badRequest', 'text/xml');
+                          break;
+                      case "/unauthorized":
+                          sendAjax('/unauthorized', 'text/xml');
+                          break;
+                      case "/forbidden":
+                          sendAjax('/forbidden', 'text/xml');
+                          break;
+                      case "/internal":
+                          sendAjax('/internal', 'text/xml');
+                          break;
+                      case "/notImplemented":
+                          sendAjax('/notImplemented', 'text/xml');
+                          break;
+                      default:
+                          sendAjax('/notFound', 'text/xml');
+                          break;
+                  }
+              }
+          }
+
+          sendButton.addEventListener('click', sendData);
+      };
+
+      window.onload = init;
 
   </script>
 </head>
