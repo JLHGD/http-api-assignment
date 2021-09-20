@@ -12,33 +12,41 @@
 
           const content = document.querySelector('#content');
 
-          const h1 = document.createElement('h1');
-          const p = document.createElement('p');
+            switch(xhr.status){
+                case 200:
+                    content.innerHTML = '<b>Success<b>';
+                    break;
+                case 400:
+                    content.innerHTML = '<b>Bad Request<b>';
+                    break;
+                case 401:
+                    content.innerHTML = '<b>Unauthorized<b>';
+                    break;
+                case 403:
+                    content.innerHTML = '<b>Forbidden<b>';
+                    break;
+                case 500:
+                    content.innerHTML = '<b>Internal Server Error<b>';
+                    break;
+                case 501:
+                    content.innerHTML = '<b>Not Implemented<b>';
+                    break;
+                case 404:
+                    content.innerHTML = '<b>Resource Not Found<b>';
+                    break;
+                default:
+                    content.innerHTML = '<b>Error Code Not Implemented By Client<b>';
+                    break;
+            }
 
           if(type === 'application/json'){
               const obj = JSON.parse(xhr.response);
-              if(obj.id){
-                  h1.textContent = obj.id;
-              }
-              else{
-                  h1.textContent = "Success";
-              }
-              p.textContent = obj.message;
+              content.innerHTML += `<p>${obj.message}</p>`;
           }
           else if(type === 'text/xml'){
-              if(xhr.responseXML.querySelector('id')){
-                  const id = xhr.responseXML.querySelector('id').textContent;
-                  h1.textContent = id;
-              }
-              else{
-                  h1.textContent = "Success";
-              }
               const message = xhr.responseXML.querySelector('message').textContent;
-              p.textContent = message;
+              content.innerHTML += `<p>${message}</p>`;
           }
-
-          content.appendChild(h1);
-          content.appendChild(p);
 
           console.log(xhr.response);
       };
@@ -60,11 +68,12 @@
           const pageSelector = document.querySelector('#page');
 
           const sendData = () => {
+              //sendAjax('/', 'text/html');
               if(typeSelector.value === 'application/json'){
                   switch (pageSelector.value) {
-                      case "/":
-                          sendAjax('/', 'application/json');
-                          break;
+                      // case "/":
+                      //     sendAjax('/', 'application/json');
+                      //     break;
                       case "/success":
                           sendAjax('/success', 'application/json');
                           break;
@@ -90,9 +99,9 @@
               }
               else if(typeSelector.value === 'text/xml'){
                     switch (pageSelector.value) {
-                      case "/":
-                          sendAjax('/', 'text/xml');
-                          break;
+                      // case "/":
+                      //     sendAjax('/', 'text/xml');
+                      //     break;
                       case "/success":
                           sendAjax('/success', 'text/xml');
                           break;
